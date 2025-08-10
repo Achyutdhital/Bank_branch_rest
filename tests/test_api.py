@@ -10,23 +10,25 @@ class BankAPITest(TestCase):
     
     def setUp(self):
         self.client = APIClient()
-        self.bank1 = Bank.objects.create(name='State Bank of India', code='SBI')
-        self.bank2 = Bank.objects.create(name='HDFC Bank', code='HDFC')
+        self.bank1 = Bank.objects.create(id=1, name='State Bank of India')
+        self.bank2 = Bank.objects.create(id=2, name='HDFC Bank')
         
         self.branch1 = Branch.objects.create(
-            bank=self.bank1,
-            name='Mumbai Branch',
             ifsc='SBIN0000001',
+            bank=self.bank1,
+            branch='Mumbai Branch',
             address='123 Fort Area, Mumbai',
             city='Mumbai',
+            district='Greater Mumbai',
             state='Maharashtra'
         )
         self.branch2 = Branch.objects.create(
-            bank=self.bank2,
-            name='Delhi Branch',
             ifsc='HDFC0000001',
+            bank=self.bank2,
+            branch='Delhi Branch',
             address='456 CP, New Delhi',
             city='Delhi',
+            district='Central Delhi',
             state='Delhi'
         )
     
@@ -47,7 +49,7 @@ class BankAPITest(TestCase):
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['name'], 'State Bank of India')
-        self.assertEqual(response.data['code'], 'SBI')
+        self.assertEqual(response.data['id'], 1)
     
     def test_bank_branches_api(self):
         """Test GET /api/banks/{id}/branches/"""
@@ -56,7 +58,7 @@ class BankAPITest(TestCase):
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['results']), 1)
-        self.assertEqual(response.data['results'][0]['name'], 'Mumbai Branch')
+        self.assertEqual(response.data['results'][0]['branch'], 'Mumbai Branch')
         self.assertEqual(response.data['results'][0]['bank_name'], 'State Bank of India')
 
 
@@ -65,22 +67,24 @@ class BranchAPITest(TestCase):
     
     def setUp(self):
         self.client = APIClient()
-        self.bank = Bank.objects.create(name='Test Bank', code='TEST')
+        self.bank = Bank.objects.create(id=1, name='Test Bank')
         
         self.branch1 = Branch.objects.create(
-            bank=self.bank,
-            name='Mumbai Branch',
             ifsc='TEST0000001',
+            bank=self.bank,
+            branch='Mumbai Branch',
             address='123 Test Street, Mumbai',
             city='Mumbai',
+            district='Greater Mumbai',
             state='Maharashtra'
         )
         self.branch2 = Branch.objects.create(
-            bank=self.bank,
-            name='Delhi Branch',
             ifsc='TEST0000002',
+            bank=self.bank,
+            branch='Delhi Branch',
             address='456 Test Street, Delhi',
             city='Delhi',
+            district='Central Delhi',
             state='Delhi'
         )
     
@@ -93,12 +97,12 @@ class BranchAPITest(TestCase):
         self.assertEqual(len(response.data['results']), 2)
     
     def test_branch_detail_api(self):
-        """Test GET /api/branches/{id}/"""
-        url = reverse('branch-detail', kwargs={'id': self.branch1.id})
+        """Test GET /api/branches/{ifsc}/"""
+        url = reverse('branch-detail', kwargs={'ifsc': self.branch1.ifsc})
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['name'], 'Mumbai Branch')
+        self.assertEqual(response.data['branch'], 'Mumbai Branch')
         self.assertEqual(response.data['ifsc'], 'TEST0000001')
         self.assertEqual(response.data['bank']['name'], 'Test Bank')
     
@@ -108,7 +112,7 @@ class BranchAPITest(TestCase):
         response = self.client.get(url, {'ifsc': 'TEST0000001'})
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['branch']['name'], 'Mumbai Branch')
+        self.assertEqual(response.data['branch']['branch'], 'Mumbai Branch')
         self.assertEqual(response.data['branch']['ifsc'], 'TEST0000001')
     
     def test_branch_search_by_city(self):

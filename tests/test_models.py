@@ -7,28 +7,20 @@ class BankModelTest(TestCase):
     
     def setUp(self):
         self.bank = Bank.objects.create(
-            name='Test Bank',
-            code='TEST'
+            id=1,
+            name='Test Bank'
         )
     
     def test_bank_creation(self):
         """Test bank creation."""
         self.assertEqual(self.bank.name, 'Test Bank')
-        self.assertEqual(self.bank.code, 'TEST')
+        self.assertEqual(self.bank.id, 1)
         self.assertTrue(self.bank.created_at)
         self.assertTrue(self.bank.updated_at)
     
     def test_bank_str_method(self):
         """Test bank string representation."""
-        self.assertEqual(str(self.bank), 'Test Bank (TEST)')
-    
-    def test_bank_unique_constraints(self):
-        """Test bank unique constraints."""
-        with self.assertRaises(Exception):
-            Bank.objects.create(name='Test Bank', code='TEST2')
-        
-        with self.assertRaises(Exception):
-            Bank.objects.create(name='Test Bank 2', code='TEST')
+        self.assertEqual(str(self.bank), 'Test Bank')
 
 
 class BranchModelTest(TestCase):
@@ -36,23 +28,25 @@ class BranchModelTest(TestCase):
     
     def setUp(self):
         self.bank = Bank.objects.create(
-            name='Test Bank',
-            code='TEST'
+            id=1,
+            name='Test Bank'
         )
         self.branch = Branch.objects.create(
-            bank=self.bank,
-            name='Test Branch',
             ifsc='TEST0000001',
+            bank=self.bank,
+            branch='Test Branch',
             address='123 Test Street',
             city='Test City',
+            district='Test District',
             state='Test State'
         )
     
     def test_branch_creation(self):
         """Test branch creation."""
-        self.assertEqual(self.branch.name, 'Test Branch')
+        self.assertEqual(self.branch.branch, 'Test Branch')
         self.assertEqual(self.branch.ifsc, 'TEST0000001')
         self.assertEqual(self.branch.bank, self.bank)
+        self.assertEqual(self.branch.district, 'Test District')
         self.assertTrue(self.branch.created_at)
         self.assertTrue(self.branch.updated_at)
     
@@ -64,11 +58,12 @@ class BranchModelTest(TestCase):
         """Test branch IFSC uniqueness."""
         with self.assertRaises(Exception):
             Branch.objects.create(
-                bank=self.bank,
-                name='Another Branch',
                 ifsc='TEST0000001',
+                bank=self.bank,
+                branch='Another Branch',
                 address='456 Another Street',
                 city='Another City',
+                district='Another District',
                 state='Another State'
             )
     

@@ -10,8 +10,8 @@ urlpatterns = [
     path('banks/<int:id>/', views.BankDetailView.as_view(), name='bank-detail'),
     path('banks/<int:bank_id>/branches/', views.BankBranchesView.as_view(), name='bank-branches'),
     
-    # Branches endpoints
+    # Branches endpoints - put search before the IFSC detail endpoint
     path('branches/', views.BranchListView.as_view(), name='branch-list'),
-    path('branches/<int:id>/', views.BranchDetailView.as_view(), name='branch-detail'),
     path('branches/search/', views.branch_search, name='branch-search'),
+    path('branches/<str:ifsc>/', views.BranchDetailView.as_view(), name='branch-detail'),
 ]

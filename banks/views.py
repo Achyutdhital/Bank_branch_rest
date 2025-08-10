@@ -62,11 +62,11 @@ class BranchDetailView(generics.RetrieveAPIView):
     """
     Retrieve a specific branch.
     
-    Returns detailed information about a specific branch by ID, including bank details.
+    Returns detailed information about a specific branch by IFSC code, including bank details.
     """
     queryset = Branch.objects.select_related('bank').all()
     serializer_class = BranchDetailSerializer
-    lookup_field = 'id'
+    lookup_field = 'ifsc'
 
 
 @swagger_auto_schema(
@@ -179,7 +179,7 @@ def api_overview(request):
         },
         'Branches': {
             'List all branches': '/api/branches/',
-            'Branch details': '/api/branches/{id}/',
+            'Branch details': '/api/branches/{ifsc_code}/',
             'Search by IFSC': '/api/branches/search/?ifsc={ifsc_code}',
             'Search by city': '/api/branches/search/?city={city_name}'
         }

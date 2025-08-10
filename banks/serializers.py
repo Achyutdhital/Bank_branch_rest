@@ -7,18 +7,18 @@ class BankSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Bank
-        fields = ['id', 'name', 'code', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
 
 class BranchListSerializer(serializers.ModelSerializer):
     """Serializer for Branch model in list views."""
     bank_name = serializers.CharField(source='bank.name', read_only=True)
-    bank_code = serializers.CharField(source='bank.code', read_only=True)
+    bank_id = serializers.IntegerField(source='bank.id', read_only=True)
     
     class Meta:
         model = Branch
-        fields = ['id', 'name', 'ifsc', 'city', 'state', 'bank_name', 'bank_code']
+        fields = ['ifsc', 'branch', 'city', 'district', 'state', 'bank_name', 'bank_id']
 
 
 class BranchDetailSerializer(serializers.ModelSerializer):
@@ -27,8 +27,8 @@ class BranchDetailSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Branch
-        fields = ['id', 'name', 'ifsc', 'address', 'city', 'state', 'bank', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        fields = ['ifsc', 'branch', 'address', 'city', 'district', 'state', 'bank', 'created_at', 'updated_at']
+        read_only_fields = ['ifsc', 'created_at', 'updated_at']
 
 
 class BankWithBranchesSerializer(serializers.ModelSerializer):
@@ -38,5 +38,5 @@ class BankWithBranchesSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Bank
-        fields = ['id', 'name', 'code', 'branch_count', 'branches', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'branch_count', 'branches', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']

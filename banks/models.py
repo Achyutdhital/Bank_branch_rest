@@ -3,8 +3,8 @@ from django.db import models
 
 class Bank(models.Model):
     """Bank model representing a financial institution."""
-    name = models.CharField(max_length=100, unique=True)
-    code = models.CharField(max_length=10, unique=True)
+    id = models.BigIntegerField(primary_key=True)  # Using BigIntegerField to match original data
+    name = models.CharField(max_length=49)  # Matching original max length
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -13,28 +13,29 @@ class Bank(models.Model):
         ordering = ['name']
 
     def __str__(self):
-        return f"{self.name} ({self.code})"
+        return self.name
 
 
 class Branch(models.Model):
     """Branch model representing a bank branch."""
+    ifsc = models.CharField(max_length=11, primary_key=True)  # IFSC as primary key
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, related_name='branches')
-    name = models.CharField(max_length=100)
-    ifsc = models.CharField(max_length=11, unique=True)
-    address = models.TextField()
+    branch = models.CharField(max_length=74)  # Using 'branch' to match original data
+    address = models.CharField(max_length=195)  # Using CharField with specific length
     city = models.CharField(max_length=50)
-    state = models.CharField(max_length=50)
+    district = models.CharField(max_length=50)  # Added district field from original
+    state = models.CharField(max_length=26)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'branches'
-        ordering = ['bank__name', 'name']
+        ordering = ['bank__name', 'branch']
         indexes = [
-            models.Index(fields=['ifsc']),
             models.Index(fields=['city']),
             models.Index(fields=['state']),
+            models.Index(fields=['district']),
         ]
 
     def __str__(self):
-        return f"{self.name} - {self.bank.name}"
+        return f"{self.branch} - {self.bank.name}"

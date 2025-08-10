@@ -5,7 +5,7 @@ A REST API server for querying bank branches and their details, built with Djang
 ## Features
 
 - REST API endpoints for bank and branch data
-- SQLite database with sample data
+- **Real Data**: Complete Indian Banks dataset with 170 banks and 127,857 branches
 - Clean code architecture with proper separation of concerns
 - Comprehensive test cases
 - Error handling and validation
@@ -25,7 +25,7 @@ A REST API server for querying bank branches and their details, built with Djang
 
 ### Branches
 - `GET /api/branches/` - Get all branches with pagination
-- `GET /api/branches/{branch_id}/` - Get specific branch details
+- `GET /api/branches/{ifsc_code}/` - Get specific branch details by IFSC code
 - `GET /api/branches/search/?ifsc={ifsc_code}` - Search branch by IFSC code
 - `GET /api/branches/search/?city={city_name}` - Search branches by city
 
@@ -41,10 +41,11 @@ A REST API server for querying bank branches and their details, built with Djang
    python manage.py makemigrations
    python manage.py migrate
    ```
-4. Initialize the database with sample data:
+4. Initialize the database with real bank and branch data:
    ```bash
-   python manage.py init_data
+   python manage.py load_real_data
    ```
+   This will load **170 banks** and **127,857 branches** from the official Indian Banks dataset.
 5. Create a superuser (optional):
    ```bash
    python manage.py createsuperuser
@@ -160,14 +161,13 @@ Access the Django admin interface at `http://localhost:8000/admin/` after creati
 ### Get All Banks
 ```json
 {
-  "count": 5,
-  "next": null,
+  "count": 170,
+  "next": "http://localhost:8000/api/banks/?page=2",
   "previous": null,
   "results": [
     {
-      "id": 1,
-      "name": "HDFC Bank",
-      "code": "HDFC",
+      "id": 60,
+      "name": "ABHYUDAYA COOPERATIVE BANK LIMITED",
       "created_at": "2024-01-01T10:00:00Z",
       "updated_at": "2024-01-01T10:00:00Z"
     }
@@ -178,16 +178,15 @@ Access the Django admin interface at `http://localhost:8000/admin/` after creati
 ### Get Branch Details
 ```json
 {
-  "id": 1,
-  "name": "Mumbai Main Branch",
   "ifsc": "SBIN0000001",
+  "branch": "Mumbai Main Branch",
   "address": "123 Fort Area, Mumbai",
   "city": "Mumbai",
+  "district": "Greater Mumbai",
   "state": "Maharashtra",
   "bank": {
     "id": 1,
     "name": "State Bank of India",
-    "code": "SBI",
     "created_at": "2024-01-01T10:00:00Z",
     "updated_at": "2024-01-01T10:00:00Z"
   },
@@ -201,13 +200,13 @@ Access the Django admin interface at `http://localhost:8000/admin/` after creati
 {
   "branches": [
     {
-      "id": 1,
-      "name": "Mumbai Main Branch",
       "ifsc": "SBIN0000001",
+      "branch": "Mumbai Main Branch",
       "city": "Mumbai",
+      "district": "Greater Mumbai",
       "state": "Maharashtra",
       "bank_name": "State Bank of India",
-      "bank_code": "SBI"
+      "bank_id": 1
     }
   ]
 }
